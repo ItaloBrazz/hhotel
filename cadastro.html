@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/cadastro.css">
+    <link rel="stylesheet" href="css/modal.css"> 
+    <link rel="shortcut icon" href="https://s3-alpha-sig.figma.com/img/99c3/714a/5b084d7bd3c214e11238aeb0272997af?Expires=1744588800&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=JOiPR4fxUf~-U9KUCCbezw3XgvW1aedOywa6neusYsKHlxB6y3JnZ78Cr4qWirARSB-FYchc2YarjW~MXbUa3St5V3QcnGhnjhbB0MG4gNaV7s4h0scT7uh6N3Jxz2~Dv8nuFyORnm6T5GXewg1wi4hqCNTzZi7lcr0lyhuAF6Wjrh~kqahc6WDKzvbyhiz~lYXX16Wo-t45ay5K1xEHAtszJFEeB3HaEeBwCpzqR0G-8CgpI3Q0KxWHJ7a0IzDElCC0Gs~DpShy~F9XAT7WhhRjZV9YQTPiWBGeDEqHgI2HDyNAMgoYqcSZImjsTP6nnXgnvaKAqSn~zWUnC5sldw__" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>HHotel - Cadastro</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"><a href=""><img src="https://s3-alpha-sig.figma.com/img/99c3/714a/5b084d7bd3c214e11238aeb0272997af?Expires=1744588800&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=JOiPR4fxUf~-U9KUCCbezw3XgvW1aedOywa6neusYsKHlxB6y3JnZ78Cr4qWirARSB-FYchc2YarjW~MXbUa3St5V3QcnGhnjhbB0MG4gNaV7s4h0scT7uh6N3Jxz2~Dv8nuFyORnm6T5GXewg1wi4hqCNTzZi7lcr0lyhuAF6Wjrh~kqahc6WDKzvbyhiz~lYXX16Wo-t45ay5K1xEHAtszJFEeB3HaEeBwCpzqR0G-8CgpI3Q0KxWHJ7a0IzDElCC0Gs~DpShy~F9XAT7WhhRjZV9YQTPiWBGeDEqHgI2HDyNAMgoYqcSZImjsTP6nnXgnvaKAqSn~zWUnC5sldw__" alt="logo"></a></div>
+        
+        <div class="form-container">
+            <div class="form-content">
+                <h2 class="form-title">Cadastrar-se</h2>
+                <form id="registerForm" class="form">
+                    <label class="label-input" for="name">
+                        <i class="fa-solid fa-user icon-modify"></i>
+                        <input type="text" name="name" id="name" placeholder="Nome" required> 
+                    </label>
+                    <label class="label-input" for="email">
+                        <i class="fa-solid fa-envelope icon-modify"></i>
+                        <input type="email" name="email" id="email" placeholder="E-mail" required> 
+                    </label>
+                    <label class="label-input" for="password">
+                        <i class="fa-solid fa-lock icon-modify"></i>
+                        <input type="password" name="password" id="password" placeholder="Senha" required> 
+                    </label>
+                    <button class="btn-form" type="submit">CADASTRAR-SE</button>
+                    <p class="divider">ou continue com</p>
+                    <div class="social-media">
+                        <ul class="list-social-media">
+                            <li><a href="#"><i class="fa-brands fa-google icon-social"></i></a></li>
+                            <li><a href="#"><i class="fa-brands fa-facebook icon-social"></i></a></li>
+                            <li><a href="#"><i class="fa-brands fa-apple icon-social"></i></a></li>
+                        </ul>
+                    </div>
+                    <div class="login-link">
+                        <p>Já tem uma conta? <a href="index.html">Faça login aqui</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="corner-image">
+            <img src="img/bonecocadastro.png" alt="">
+        </div>
+    </div>
+    
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <i class="fas fa-check-circle check-icon"></i>
+            <h2 class="modal-title">Cadastro Concluído!</h2>
+            <p class="modal-message">Seu cadastro foi realizado com sucesso. Clique no botão abaixo para ir para a página de login.</p>
+            <button class="modal-btn" id="modalCloseBtn">Ir para Login</button>
+        </div>
+    </div>
+
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('successModal');
+    const form = document.getElementById('registerForm');
+    
+    // Mostrar modal (função separada para reuso)
+    function showModal() {
+        modal.classList.add('show');  // Usando a classe 'show' para aplicar a animação
+        document.body.style.overflow = 'hidden'; // Impede scroll da página
+    }
+    
+    // Fechar modal
+    function closeModal() {
+        modal.classList.remove('show');  // Remover a classe 'show' ao fechar
+        document.body.style.overflow = 'auto'; // Restaura scroll
+    }
+    
+    // Botão de fechar
+    document.getElementById('modalCloseBtn').addEventListener('click', function() {
+        closeModal();
+        window.location.href = 'index.html'; // Redireciona para login após fechar o modal
+    });
+    
+    // Fechar ao clicar fora do modal
+    modal.querySelector('.modal-content').addEventListener('click', function(e) {
+        e.stopPropagation(); // Impede o evento de propagação para o modal e fechar sem querer
+    });
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) { // Fechar o modal se o usuário clicar fora da área do conteúdo
+            closeModal();
+            window.location.href = 'index.html'; // Redireciona para login após fechar o modal
+        }
+    });
+    
+    // Formulário
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Cadastrando...';
+        
+        try {
+            const response = await fetch('http://localhost:3000/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showModal(); 
+                form.reset();
+            } else {
+                alert(data.error || 'Erro no cadastro');
+            }
+        } catch (error) {
+            alert('Erro ao conectar ao servidor');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'CADASTRAR-SE';
+        }
+    });
+});
+
+    </script>
+    
+</body>
+</html>
