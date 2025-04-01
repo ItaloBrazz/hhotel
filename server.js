@@ -7,23 +7,31 @@ const path = require('path');
 const app = express();
 const db = new sqlite3.Database('./banco.db');
 
-// Configurações
-app.use(cors()); 
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); // Para processar requisições urlencoded
-app.use(express.static(path.join(__dirname, 'public')));
+// Configurações do servidor
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0'; // Importante para Replit
 
-// Rota para a página de cadastro (GET)
-app.get('/cadastro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'cadastro.html'));
+// Middlewares
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname)); // Serve arquivos da raiz do projeto
+
+// Rotas para páginas HTML
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Rota para a página de login (GET)
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Rota de cadastro (POST)
+app.get('/cadastro', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cadastro.html'));
+});
+
+// Rotas de API
 app.post('/auth/register', async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -33,7 +41,10 @@ app.post('/auth/register', async (req, res) => {
 
     try {
         db.get('SELECT email FROM usuarios WHERE email = ?', [email], async (err, row) => {
-            if (err) throw err;
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Erro no servidor' });
+            }
             
             if (row) {
                 return res.status(400).json({ error: 'E-mail já cadastrado!' });
@@ -46,7 +57,10 @@ app.post('/auth/register', async (req, res) => {
                 'INSERT INTO usuarios (login, senha, email) VALUES (?, ?, ?)',
                 [name, senhaHash, email],
                 (err) => {
-                    if (err) throw err;
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+                    }
                     res.json({ success: 'Cadastro realizado!' });
                 }
             );
@@ -57,7 +71,6 @@ app.post('/auth/register', async (req, res) => {
     }
 });
 
-// Rota de login (POST)
 app.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -67,7 +80,10 @@ app.post('/auth/login', async (req, res) => {
 
     try {
         db.get('SELECT * FROM usuarios WHERE email = ?', [email], async (err, user) => {
-            if (err) throw err;
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Erro no servidor' });
+            }
             
             if (!user) {
                 return res.status(404).json({ error: 'E-mail não cadastrado!' });
@@ -94,24 +110,25 @@ app.post('/auth/login', async (req, res) => {
     }
 });
 
-// Rota para buscar os dados do usuário (GET)
 app.get('/auth/user/:id', (req, res) => {
     const userId = req.params.id;
 
     db.get('SELECT login, email FROM usuarios WHERE id = ?', [userId], (err, user) => {
-        if (err) return res.status(500).json({ error: 'Erro no servidor' });
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Erro no servidor' });
+        }
         if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-
-        res.json(user); // Agora retorna { login: '...', email: '...' }
+        res.json(user);
     });
 });
-
 
 app.delete('/auth/delete/:id', (req, res) => {
     const userId = req.params.id;
 
     db.run('DELETE FROM usuarios WHERE id = ?', [userId], function(err) {
         if (err) {
+            console.error(err);
             return res.status(500).json({ error: 'Erro ao excluir o perfil.' });
         }
         if (this.changes === 0) {
@@ -120,8 +137,6 @@ app.delete('/auth/delete/:id', (req, res) => {
         res.json({ success: 'Perfil excluído com sucesso!' });
     });
 });
-
-
 
 app.put('/auth/update', async (req, res) => {
     const { id, name, email, password } = req.body;
@@ -143,6 +158,7 @@ app.put('/auth/update', async (req, res) => {
             [name, email, senhaHash, id],
             function (err) {
                 if (err) {
+                    console.error(err);
                     return res.status(500).json({ error: 'Erro ao atualizar o perfil.' });
                 }
                 if (this.changes === 0) {
@@ -157,7 +173,15 @@ app.put('/auth/update', async (req, res) => {
     }
 });
 
-// Inicia o servidor
-app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
+// Rota de fallback para páginas não encontradas
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
+
+// Inicia o servidor
+app.listen(PORT, HOST, () => {
+    console.log(`Servidor rodando em http://${HOST}:${PORT}`);
+});
+
+// Export para hospedagens como Vercel
+module.exports = app;
